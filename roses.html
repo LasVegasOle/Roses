@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Roses</title>
+		<link href="roses-style.css" rel="stylesheet" type="text/css">
+</head>
+<body onresize="resize_canvas()">
+	
+	<div id="parameters">
+		<h1><a href="http://en.wikipedia.org/wiki/Rose_(mathematics)">Roses</a></h1>
+
+		<p><label class="field" for="diameter">Rose OD [<em>mm</em>]:</label>
+		<input id="diameter" type ="input" value="80"/></p>
+		<p>
+			<label class="field" for="n">n:</label>
+			<input id="n" type ="input" value="2"/>
+		</p>
+		<p>
+			<label class="field" for="d">d:</label>
+			<input id="d" type ="input" value="1"/>
+		</p>
+		<p>
+			<label class="field" for="rose_turns">Rose turns:</label>
+			<input id="rose_turns" type ="input" value="360"/>
+		</p>
+		<p>
+			<label class="field" for="height">Height [<em>mm</em>]:</label>
+			<input id="height" type ="input" value="1.2"/>
+		</p>
+		<p>
+			<label class="field" for="first_height">1st layer height [<em>mm</em>]:</label>
+			<input id="first_height" type ="input" value="0.5"/>
+		</p>
+		<p>
+			<label class="field" for="layers"># layers:</label>
+			<input id="layers" type ="input" value="1"/>
+		</p>
+		<p>
+			<label class="field" for="rotation">Rotation [<em>deg/layer</em>]:</label>
+			<input id="rotation" type ="input" value="0"/>
+		</p>
+		<p>
+			<label class="field" for="scale">Scale top layer [<em>%</em>]:</label>
+			<input id="scale" type ="input" value="100"/>
+		</p>
+		<p>
+			<label class="field" for="feedrate">Feedrate [<em>mm/min</em>]:</label>
+			<input id="feedrate" type ="input" value="6000"/>
+		</p>
+		<p>
+			<label class="field" for="delay">Initial delay [<em>ms</em>]:</label>
+			<input id="delay" type ="input" value="300"/>
+		</p>
+		<p>
+			<label class="field" for="name">File name:</label>
+			<input id="name" type ="input" value="Rose"/>
+		</p>
+		<p>
+			<button id="gcode" onclick="createFile();">GCode</button>
+		</p>
+
+	</div>
+	
+	<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable lateron,
+         the id 'WebGLCanvas' is applied to it. -->
+	<div id="WebGLCanvas"></div>
+	
+	<script type="text/javascript" src="js/three.min.js"></script>
+	<script type="text/javascript" src="js/roses-3d-viewer.js"></script>
+	<script type="text/javascript" src="js/roses-script.js"></script>
+	<script type="text/javascript" src="js/FileSaver.js"></script>
+	
+</body>
+</html>
