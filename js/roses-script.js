@@ -5,6 +5,10 @@ document.getElementById('parameters').addEventListener('change', eventChangeHand
 
 function eventChangeHandler(e) {
 	if (e.target !== e.currentTarget) {
+	
+		var item = e.target.id;
+		if(item == "layers")
+			updateZCamera(document.getElementById("layers").value);
         drawing(document.getElementById("n").value, document.getElementById("d").value);
 	}
     e.stopPropagation();

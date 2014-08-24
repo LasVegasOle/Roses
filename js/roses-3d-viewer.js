@@ -7,6 +7,10 @@ renderer.setClearColorHex(0xFFFFFF, 1);
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
+var spinningGroup = new THREE.Object3D();
+spinningGroup.visible = true;
+scene.add( spinningGroup ); 
+
 // Get the DIV element from the HTML document by its ID and append the renderers DOM
 // object to it
 document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
@@ -17,27 +21,31 @@ camera.lookAt(new THREE.Vector3(0,0,0));
 
 function render() {
 	requestAnimationFrame(render);
-	//base.rotation.z += 0.003;	
+	spinningGroup.rotation.z += 0.0015;	
 	renderer.render(scene, camera);
 }
 render();
 	
 // @brief Draws a base and the points array	path
 function draw3dRose(radius){
-	console.log(rose_array);
 	removePreviousBase();
 	addNewBase(radius);
 	removePreviousPath();
 	addNewPath();
 }
 
+function updateZCamera(layers){
+	camera.position.z = 50 + Number(layers);
+}
+
 function removePreviousBase(){
 	var obj, i;
-	var base = scene.getObjectByName( "base" );
-	for ( i = scene.children.length - 1; i >= 0 ; i -- ) {
-		obj = scene.children[ i ];
+	var base = spinningGroup.getObjectByName( "base" );
+	console.log(base);
+	for ( i = spinningGroup.children.length - 1; i >= 0 ; i -- ) {
+		obj = spinningGroup.children[ i ];
 		if ( obj == base ) {
-			scene.remove(obj);
+			spinningGroup.remove(obj);
 		}
 	}
 }
@@ -50,7 +58,7 @@ function addNewBase(rad){
 	var circleMaterial = new THREE.MeshBasicMaterial( {color: 0xBBFFFF, side: THREE.DoubleSide} );
 	var base = new THREE.Mesh( circleGeometry, circleMaterial );
 	base.name = "base";
-	scene.add( base );
+	spinningGroup.add( base );
 }
 
 // @brief add the new path to the base
@@ -66,14 +74,14 @@ function addNewPath(){
 		geometry.vertices.push( new THREE.Vector3(  rose_array[i][0],  rose_array[i][1], rose_array[i][2]) );
 	
 	var line = new THREE.Line( geometry, material );
-	var base = scene.getObjectByName( "base" );
+	var base = spinningGroup.getObjectByName( "base" );
 	base.add( line );
 }
 
 // @brief Sweeps all objects within scene and deletes base object
 function removePreviousPath(){
 	var obj, i;
-	var base = scene.getObjectByName( "base" );
+	var base = spinningGroup.getObjectByName( "base" );
 	for ( i = base.children.length - 1; i >= 0 ; i -- ) {
 		obj = base.children[ i ];
 		if ( obj !==base) {
