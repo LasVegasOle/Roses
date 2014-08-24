@@ -55,42 +55,30 @@ function createRosePath(){
 
 
 function buildGCode() {
-	var layer = layerGCode(0,1, 0);
-	var fullGCode =[];
-	fullGCode = layer.slice(0);
-	// Add missing Gcodes
-	//homing
-	fullGCode.splice(0,0,"G28");
-	// Open air extrusion
-	fullGCode.splice(2,0,"M126");
-	// Open air extrusion
-	fullGCode.splice(3,0,"G4 P" + document.getElementById("delay").value);
+
+	var fullGCode ="G28 \n";
+	var layer = 0;
 	
-	// Adding feedrate and first height value
-	fullGCode[1] = fullGCode[1] + " Z" + document.getElementById("first_height").value + 
-	" F" + document.getElementById("feedrate").value;
-	
-	for(var h = 1; h < document.getElementById("layers").value; h++){
-		// Calculate desired rotation per height
-		var loopRotation = document.getElementById("rotation").value * h;
-		var loopScale = layerScale(h);
-		console.log("scale = " + loopScale);
-				
-		// Generate layerGCode and append to fullGcode array
-		layer = layerGCode(loopRotation,loopScale, h);
-		fullGCode = fullGCode.concat(layer);
-		
-		// Add feedrate and layerheight to each new layer code
-		var layer_height = Number(document.getElementById("height").value) * h + 
-		Number(document.getElementById("first_height").value);
-		fullGCode[2+layer.length*(h)] = layer[0] + " Z" + layer_height + 
-		" F" + document.getElementById("feedrate").value;
+	for(var i = 0; i < rose_array.length; i++){
+		if(i == 0){ // First layer
+			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] 
+						+ " Z" + rose_array[i][2] + " F" + document.getElementById("feedrate").value + "\n";
+			fullGCode += "M126 \n";
+			fullGCode += "G4 P" + document.getElementById("delay").value + "\n";
+			layer = rose_array[i][2];
+		}
+		else if(layer != rose_array[i][2]){
+			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] + " Z" + rose_array[i][2] + "\n";
+		}
+		else
+			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] + "\n";
+			layer = rose_array[i][2];
 	}
 	
 	// Close air extrusion
-	fullGCode[fullGCode.length] = "M127";
+	fullGCode += "M127 \n";
 	//homing
-	fullGCode[fullGCode.length] = "G28";
+	fullGCode += "G28 \n";
 	
 	return fullGCode;
 }
@@ -133,7 +121,7 @@ function resize_canvas(){
 
 function createFile(){
 	var output = getParameters();
-	output += buildGCode().join("\n");
+	output += buildGCode();
 	var GCodeFile = new Blob([output], {type: 'text/plain'});
 	saveAs(GCodeFile, document.getElementById("name").value + '.gcode');
 	//window.open().document.write(output);
@@ -141,12 +129,12 @@ function createFile(){
 
 function getParameters(){
 var params = [];
-	params += "; GCode generated with Roses from www.3digitalcooks.com </br>";
-	params += "; Layer height [mm]: " + document.getElementById("height").value + "</br>";
-	params += "; 1st layer height [mm]: " + document.getElementById("first_height").value + "</br>";
-	params += "; Number of layers: " + document.getElementById("layers").value + "</br>"; 
-	params += "; Feedrate [mm/min]: " + document.getElementById("feedrate").value + "</br>"; 
-	params += "; Initial delay [ms]: " + document.getElementById("delay").value + "</br>"; 
+	params += "; GCode generated with Roses from www.3digitalcooks.com \n";
+	params += "; Layer height [mm]: " + document.getElementById("height").value + "\n";
+	params += "; 1st layer height [mm]: " + document.getElementById("first_height").value + "\n";
+	params += "; Number of layers: " + document.getElementById("layers").value + "\n"; 
+	params += "; Feedrate [mm/min]: " + document.getElementById("feedrate").value + "\n"; 
+	params += "; Initial delay [ms]: " + document.getElementById("delay").value + "\n"; 
 	
 return params;
 }

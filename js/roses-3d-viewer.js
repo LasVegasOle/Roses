@@ -11,13 +11,6 @@ document.body.appendChild( renderer.domElement );
 // object to it
 document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
 
-
-// http://threejs.org/docs/#Reference/Objects/Line			
-var material = new THREE.LineBasicMaterial({
-	color: 0x0000ff,
-	linewidth : 2
-});
-
 camera.position.set(0,-70,50);
 camera.up = new THREE.Vector3(0,0,1);
 camera.lookAt(new THREE.Vector3(0,0,0));
@@ -31,7 +24,6 @@ render();
 	
 // @brief Draws a base and the points array	path
 function draw3dRose(radius){
-	alert("mosca");
 	console.log(rose_array);
 	removePreviousBase();
 	addNewBase(radius);
@@ -39,21 +31,19 @@ function draw3dRose(radius){
 	addNewPath();
 }
 
-
 function removePreviousBase(){
 	var obj, i;
 	var base = scene.getObjectByName( "base" );
 	for ( i = scene.children.length - 1; i >= 0 ; i -- ) {
 		obj = scene.children[ i ];
-		if ( obj !== base ) {
+		if ( obj == base ) {
 			scene.remove(obj);
 		}
 	}
 }
 
-function addNewBase(radius){
-
-	var radius = radius + 2;
+function addNewBase(rad){
+	var radius = rad + 2;
 	var segments = 50;
 
 	var circleGeometry = new THREE.CircleGeometry( radius, segments );	
@@ -64,8 +54,13 @@ function addNewBase(radius){
 }
 
 // @brief add the new path to the base
-function addNewPath(){
-
+function addNewPath(){	
+	// http://threejs.org/docs/#Reference/Objects/Line			
+	var material = new THREE.LineBasicMaterial({
+		color: 0x0000ff,
+		linewidth : 2
+	});
+	
 	var geometry = new THREE.Geometry();
 	for(var i = 0; i<rose_array.length; i++)
 		geometry.vertices.push( new THREE.Vector3(  rose_array[i][0],  rose_array[i][1], rose_array[i][2]) );
@@ -75,7 +70,7 @@ function addNewPath(){
 	base.add( line );
 }
 
-// @brief Sweeps all objects within scene and deletes them but Lights and camera
+// @brief Sweeps all objects within scene and deletes base object
 function removePreviousPath(){
 	var obj, i;
 	var base = scene.getObjectByName( "base" );
