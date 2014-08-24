@@ -97,8 +97,8 @@ function buildGCode() {
 
 function drawing(){
 	createRosePath();
-	var diameter = Number(document.getElementById("diameter").value)/2;
-	draw3dRose(diameter);
+	var radius = Number(document.getElementById("diameter").value)/2;
+	draw3dRose(radius);
 }
 
 function rotateRose( x, y, layerRotation){

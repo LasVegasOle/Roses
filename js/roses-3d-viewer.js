@@ -31,6 +31,8 @@ render();
 	
 // @brief Draws a base and the points array	path
 function draw3dRose(radius){
+	alert("mosca");
+	console.log(rose_array);
 	removePreviousBase();
 	addNewBase(radius);
 	removePreviousPath();
@@ -40,6 +42,7 @@ function draw3dRose(radius){
 
 function removePreviousBase(){
 	var obj, i;
+	var base = scene.getObjectByName( "base" );
 	for ( i = scene.children.length - 1; i >= 0 ; i -- ) {
 		obj = scene.children[ i ];
 		if ( obj !== base ) {
@@ -49,6 +52,7 @@ function removePreviousBase(){
 }
 
 function addNewBase(radius){
+
 	var radius = radius + 2;
 	var segments = 50;
 
