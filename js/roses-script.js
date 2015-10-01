@@ -55,8 +55,41 @@ function createRosePath(){
 			rose_array[t+h*finFor]= [ isNule(x_rotated), isNule(y_rotated), isNule(layer_height)];
 		}
 	}
+	addExtrusionValues();
 }
 
+function addExtrusionValues(){
+	var e = 0;
+	var layer = 0;
+	
+	var material_diameter = parseFloat(document.getElementById("material_diameter").value);
+    var nozzle_diameter = parseFloat(document.getElementById("nozzle_diameter").value);
+    var nozzle_surface = Math.PI * Math.pow((nozzle_diameter/2),2);
+    var material_surface = Math.PI * Math.pow((material_diameter/2),2);
+	console.log("Nozzle surface = " + nozzle_surface + ", Material Surface = " + material_surface);
+    var nozzle_material_surfaces_ratio = nozzle_surface / material_surface;
+	
+	for(var i = 0; i < rose_array.length; i++){
+		if(i == 0){ // First point no extrusion
+			rose_array[i][3] = 0;
+		} else if (layer != rose_array[i][2]) {
+			// when changing a layer do not calculate extrusion
+			rose_array[i][3] = Math.round(10000 * e) / 10000;
+		} else {
+			// Calculate distance previous and current point
+			var delta_x = rose_array[i][0] - rose_array[i-1][0];
+			var delta_y = rose_array[i][1] - rose_array[i-1][1];
+			
+			var distance = Math.sqrt(Math.pow(delta_x,2) + Math.pow(delta_y,2));
+			e += distance * nozzle_material_surfaces_ratio;
+			rose_array[i][3] = Math.round(10000 * e) / 10000;
+			
+			//console.log("delta x = " + delta_x + ", delta_y = "  + delta_y);
+			//console.log("Distance = " + distance + ", extrusion = " + e);
+		}
+	layer = rose_array[i][2];
+	}
+}
 
 function buildGCode() {
 
@@ -65,18 +98,22 @@ function buildGCode() {
 	
 	for(var i = 0; i < rose_array.length; i++){
 		if(i == 0){ // First layer
+			// Origin x,y,z plus feedrate
 			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] 
-						+ " Z" + rose_array[i][2] + " F" + document.getElementById("feedrate").value + "\n";
+						+ " Z" + rose_array[i][2] + " E" + rose_array[i][3] 
+						+ " F" + document.getElementById("feedrate").value + "\n";
 			fullGCode += "M126 \n";
 			fullGCode += "G4 P" + document.getElementById("delay").value + "\n";
 			layer = rose_array[i][2];
 		}
-		else if(layer != rose_array[i][2]){
-			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] + " Z" + rose_array[i][2] + "\n";
+		else if(layer != rose_array[i][2]){ 
+		// On each layer change add new Z value to the GCode command
+			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] + " Z" + rose_array[i][2] + " E" + rose_array[i][3] + "\n";
 		}
-		else
-			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] + "\n";
-			layer = rose_array[i][2];
+		else {
+			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] + " E" + rose_array[i][3] + "\n";
+		}
+		layer = rose_array[i][2];
 	}
 	
 	// Close air extrusion
