@@ -99,12 +99,24 @@ function buildGCode() {
 	for(var i = 0; i < rose_array.length; i++){
 		if(i == 0){ // First layer
 			// Origin x,y,z plus feedrate
+			// Reset extruder value
+			fullGCode += "G92 E0 \n";
+			// Send end effector to the first point
 			fullGCode +=  "G1 X" + rose_array[i][0] + " Y" + rose_array[i][1] 
 						+ " Z" + rose_array[i][2] + " E" + rose_array[i][3] 
 						+ " F" + document.getElementById("feedrate").value + "\n";
+			// Open air valve
 			fullGCode += "M126 \n";
+			// Add air valve flow delay
 			fullGCode += "G4 P" + document.getElementById("delay").value + "\n";
+			// Extra start length to pressurize food
+			fullGCode += "G1 E" + document.getElementById("initial_pressure").value + " F120 \n";
+			// Reset extruder value
+			fullGCode += "G92 E0\n";
 			layer = rose_array[i][2];
+			// Set printer feedrate again
+			fullGCode +=  "G1 F" + document.getElementById("feedrate").value + "\n";
+			
 		}
 		else if(layer != rose_array[i][2]){ 
 		// On each layer change add new Z value to the GCode command
@@ -116,10 +128,18 @@ function buildGCode() {
 		layer = rose_array[i][2];
 	}
 	
+	// Final retraction to avoid oozing
+	var end_retraction = rose_array[rose_array.length - 1][3] - document.getElementById("end_retraction").value;
+	fullGCode += "G1 E" + end_retraction + " F200 \n";
+	// Set printer feedrate again
+	fullGCode +=  "G1 F" + document.getElementById("feedrate").value + "\n";
+	
 	// Close air extrusion
 	fullGCode += "M127 \n";
 	//homing
 	fullGCode += "G28 \n";
+	//Disable motors
+	fullGCode += "M84 \n";
 	
 	return fullGCode;
 }
